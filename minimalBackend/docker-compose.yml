@@ -1,0 +1,55 @@
+version: '2.2'
+
+services:
+  redis:
+    image: redis
+    restart: "no"
+    entrypoint: redis-server --appendonly yes
+    ports:
+      - '6379:6379'
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.2
+
+  fdb:
+    build:
+      context: ./fdb/
+      dockerfile: Dockerfile
+    #image: thematterio/foundationdb:5.2.5-1_ubuntu-16.04
+    volumes:
+      - ./data/:/user/data/
+    #entrypoint: ["./start.sh"]
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.3
+
+  goplasma:
+    image: thematterio/plasma:standalone-test
+    environment:
+      - REDIS_HOST=redis
+      - PORT=3001
+      - FDB_REWRITE=true
+      - FDB_CLUSTER_FILE_PATH=/user/data/fdb.cluster
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./data/:/user/data/
+    depends_on:
+      - fdb
+      - redis
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 30000
+        hard: 30000
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.4
+
+
+networks:
+  static-network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          ip_range: 172.20.0.0/24
