@@ -1,15 +1,15 @@
 # How to run 
 
 ## Plasma block processor for UI purposes and feeling
-`
+```
     git clone https://github.com/matterinc/DeploymentTools.git
     cd minimalBackend
     chmod +x run.sh
     ./run.sh
-`
+```
 
 ### Give yourselves some outputs
-`
+```
     POST
     http://127.0.0.1:3001/createUTXO
     {
@@ -21,12 +21,12 @@
     }
 
     combination of block number + tx number + output number should be unique
-`
+```
 
 of course this endpoint is never used in production, just for testing purposes
 
 ### List your outputs
-`
+```
     POST
     http://127.0.0.1:3001/listUTXOs
     {
@@ -36,6 +36,6 @@ of course this endpoint is never used in production, just for testing purposes
         "outputNumber": 0,
         "limit": 50
     }
-`
+```
 
 This will list all the UTXOs that belong to the user and where created in this block, transaction and output number or later. Orders by block number, transaction number and output number in sequence
