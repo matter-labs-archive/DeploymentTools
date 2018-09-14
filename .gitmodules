@@ -1,0 +1,4 @@
+[submodule "minimalBackend/ganache/PlasmaContract"]
+	path = minimalBackend/ganache/PlasmaContract
+	url = https://github.com/matterinc/PlasmaContract.git
+	branch = master
