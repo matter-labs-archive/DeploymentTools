@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
     #image: thematterio/foundationdb:5.2.5-1_ubuntu-16.04
     volumes:
-      - ./data/:/user/data/
+      - ./data/fdb/:/user/data/
     #entrypoint: ["./start.sh"]
     networks:
       static-network:
@@ -33,7 +33,7 @@ services:
     ports:
       - '3001:3001'
     volumes:
-      - ./data/:/user/data/
+      - ./data/fdb/:/user/data/
     depends_on:
       - fdb
       - redis
@@ -46,6 +46,58 @@ services:
       static-network:
         ipv4_address: 172.20.0.4
 
+  ganache:
+    build:
+      context: ./ganache/
+      dockerfile: Dockerfile
+    volumes:
+      - ./data/contract:/data/shared
+    ports:
+      - '8545:8545'
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.5
+
+  redisQueue:
+    image: redis
+    restart: "no"
+    entrypoint: redis-server --appendonly yes
+    ports:
+      - '6380:6379'
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.6
+    
+  blockAssembler:
+    image: thematterio/blockassembler:assembler
+    restart: "no"
+    environment:
+      - ASSEMBLER_ENDPOINT=goplasma:3001
+      - DEBUG=TRUE
+      - LOCAL_STORAGE_DIR=/data/blocks/
+    volumes:
+      - ./data/blocks:/data/blocks
+    depends_on:
+      - goplasma
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.7
+  
+  blockWriter:
+    image: thematterio/blockwriter:writer
+    restart: "no"
+    environment:
+      - WRITER_ENDPOINT=goplasma:3001
+      - DEBUG=TRUE
+      - LOCAL_STORAGE_DIR=/data/blocks/
+    volumes:
+      - ./data/blocks:/data/blocks
+    depends_on:
+      - blockAssembler
+      - goplasma
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.8
 
 networks:
   static-network:

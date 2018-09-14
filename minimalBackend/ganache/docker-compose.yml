@@ -1,0 +1,11 @@
+version: '2.2'
+
+services:
+  ganache:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./data/contract:/data/shared
+    ports:
+      - '8545:8545'
