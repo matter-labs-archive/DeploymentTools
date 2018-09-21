@@ -26,7 +26,7 @@
 
 On the `4000` port there is a wrapper for API calls to the smart-contract running in Ganache test RPC
 
-### Block assembly loop and header commitment loop are run automatically in background
+## Block assembly loop and header commitment loop are run automatically in background, as well as deposits procesure and exit challenges procedure
 
 ### Give yourselves some outputs
 
