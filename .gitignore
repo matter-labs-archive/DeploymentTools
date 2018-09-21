@@ -1,2 +1,7 @@
 foundationDB*
-minimalBackend/data/*
+minimalBackend/data/blocks/*
+!minimalBackend/data/blocks/.keep
+minimalBackend/data/contract/*
+!minimalBackend/data/contract/.keep
+minimalBackend/data/fdb/*
+!minimalBackend/data/fdb/.keep
