@@ -5,8 +5,8 @@ services:
     image: redis
     restart: "no"
     entrypoint: redis-server --appendonly yes
-    ports:
-      - '6379:6379'
+    # ports:
+    #   - '6379:6379'
     networks:
       static-network:
         ipv4_address: 172.20.0.2
@@ -31,7 +31,7 @@ services:
       - FDB_REWRITE=true
       - FDB_CLUSTER_FILE_PATH=/user/data/fdb.cluster
     ports:
-      - '3001:3001'
+      - '127.0.0.1:3001:3001'
     volumes:
       - ./data/fdb/:/user/data/
     depends_on:
@@ -53,51 +53,155 @@ services:
     volumes:
       - ./data/contract:/data/shared
     ports:
-      - '8545:8545'
+      - '127.0.0.1:8545:8545'
     networks:
       static-network:
         ipv4_address: 172.20.0.5
 
-  redisQueue:
+  redisqueue:
+    # image: 'bitnami/redis:latest'
     image: redis
-    restart: "no"
+    # environment:
+    #   # ALLOW_EMPTY_PASSWORD is recommended only for development.
+    #   - ALLOW_EMPTY_PASSWORD=yes
+    #   - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
     entrypoint: redis-server --appendonly yes
-    ports:
-      - '6380:6379'
+    # ports:
+    #   - '127.0.0.1:6379:6379'
+    restart: "no"
     networks:
       static-network:
         ipv4_address: 172.20.0.6
     
-  blockAssembler:
+  blockassembler:
     image: thematterio/blockassembler:assembler
-    restart: "no"
+    restart: "always"
     environment:
       - ASSEMBLER_ENDPOINT=goplasma:3001
       - DEBUG=TRUE
-      - LOCAL_STORAGE_DIR=/data/blocks/
+      - LOCAL_STORAGE_DIR=/data/shared/blocks/
     volumes:
-      - ./data/blocks:/data/blocks
+      - ./data:/data/shared
     depends_on:
       - goplasma
     networks:
       static-network:
         ipv4_address: 172.20.0.7
   
-  blockWriter:
+  blockwriter:
     image: thematterio/blockwriter:writer
-    restart: "no"
+    restart: "always"
     environment:
       - WRITER_ENDPOINT=goplasma:3001
       - DEBUG=TRUE
-      - LOCAL_STORAGE_DIR=/data/blocks/
+      - LOCAL_STORAGE_DIR=/data/shared/blocks/
     volumes:
-      - ./data/blocks:/data/blocks
+      - ./data:/data/shared
     depends_on:
-      - blockAssembler
+      - blockassembler
       - goplasma
     networks:
       static-network:
         ipv4_address: 172.20.0.8
+    
+  headercommiter:
+    image: thematterio/headercommiter:commiter
+    restart: "always"
+    environment:
+      - DEBUG=TRUE
+      - LOCAL_STORAGE_DIR=/data/shared/blocks/
+      - ETH_KEY=8d5366123cb560bb606379f90a0bfd4769eecc0557f1b362dcae9012b548b1e5
+      - USE_SHARED_FOLDER=TRUE
+      - SHARED_FOLDER_PATH=/data/shared/contract/
+      - ETH_NODE=http://ganache:8545
+    volumes:
+      - ./data:/data/shared
+    depends_on:
+      - blockassembler
+      - ganache
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.9
+
+  challengeprocessor:
+    image: thematterio/challengeprocessor:cprocessor
+    restart: "always"
+    environment:
+      - DEBUG=TRUE
+      - REDIS_HOST=redisqueue
+      - LOCAL_STORAGE_DIR=/data/shared/blocks/
+      - USE_SHARED_FOLDER=TRUE
+      - SHARED_FOLDER_PATH=/data/shared/contract/
+      - ETH_NODE=http://ganache:8545
+    volumes:
+      - ./data:/data/shared
+    depends_on:
+      - ganache
+      - redisqueue
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.10
+
+  eventmonitor:
+    image: thematterio/eventmonitor:emonitor
+    restart: "always"
+    environment:
+      - DEBUG=TRUE
+      - REDIS_HOST=redisqueue
+      - USE_SHARED_FOLDER=TRUE
+      - SHARED_FOLDER_PATH=/data/shared/contract/
+      - ETH_NODE=http://ganache:8545
+      - BLOCKS_SHIFT=0
+      - FROM_BLOCK=1
+    volumes:
+      - ./data:/data/shared
+    depends_on:
+      - ganache
+      - redisqueue
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.11
+
+  eventprocessor:
+    image: thematterio/eventprocessor:eprocessor
+    restart: "always"
+    environment:
+      - DEBUG=TRUE
+      - REDIS_HOST=redisqueue
+      - USE_SHARED_FOLDER=TRUE
+      - SHARED_FOLDER_PATH=/data/shared/contract/
+      - ETH_NODE=http://ganache:8545
+      - EVENTPROCESSOR_ENDPOINT=goplasma:3001
+    volumes:
+      - ./data:/data/shared
+    depends_on:
+      - ganache
+      - redisqueue
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.12
+
+  ethwrapper:
+    image: thematterio/wrapper:wrapper
+    restart: "always"
+    environment:
+      - DEBUG=TRUE
+      - LOCAL_STORAGE_DIR=/data/shared
+      - USE_SHARED_FOLDER=TRUE
+      - SHARED_FOLDER_PATH=/data/shared/contract/
+      - ETH_NODE=http://ganache:8545
+      - TX_PROCESSOR_ENDPOINT=goplasma
+      - PORT=4000
+    volumes:
+      - ./data:/data/shared
+    depends_on:
+      - ganache
+      - goplasma
+    ports:
+       - '127.0.0.1:4000:4000'
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.13
 
 networks:
   static-network:

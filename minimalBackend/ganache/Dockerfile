@@ -1,4 +1,4 @@
-FROM node:10.3
+FROM node:9.11.1
 WORKDIR /usr/src/app
 RUN npm install -g ganache-cli
 RUN npm install -g truffle@4.1.3 
