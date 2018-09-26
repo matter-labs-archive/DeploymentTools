@@ -186,11 +186,11 @@ services:
     restart: "always"
     environment:
       - DEBUG=TRUE
-      - LOCAL_STORAGE_DIR=/data/shared
+      - LOCAL_STORAGE_DIR=/data/shared/blocks/
       - USE_SHARED_FOLDER=TRUE
       - SHARED_FOLDER_PATH=/data/shared/contract/
       - ETH_NODE=http://ganache:8545
-      - TX_PROCESSOR_ENDPOINT=goplasma
+      - TX_PROCESSOR_ENDPOINT=goplasma:3001
       - PORT=4000
     volumes:
       - ./data:/data/shared
