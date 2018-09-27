@@ -6,13 +6,12 @@ const BN = ethUtil.BN;
 const assert = require("assert");
 const ONE = new BN(1);
 const TWO = new BN(2);
-const delay = 1000;
-const utxoLimit = 10000;
+const delay = 10000;
+const utxoLimit = 1000;
 const promiseLimit = require('promise-limit')
 const limit = promiseLimit(500)
 let didDeposit = false
 let split = false;
-let UTXO = [];
 const txprocessorPort = 3001
 const depositorPort = 4000
 
@@ -76,7 +75,14 @@ async function getUTXOs() {
             break
         }
         let tmp = result.utxos
+        let lastUTXOcandidate = tmp[tmp.length - 1]
+        if (lastUTXO.blockNumber === lastUTXOcandidate.blockNumber &&
+            lastUTXO.transactionNumber === lastUTXOcandidate.transactionNumber &&
+            lastUTXO.outputNumber === lastUTXOcandidate.outputNumber) {
+                break
+            }
         tmp.shift()
+        lastUTXO = lastUTXOcandidate
         allUTXOs = allUTXOs.concat(tmp);
     }
     return allUTXOs
@@ -134,13 +140,13 @@ async function main() {
         })
         unsuccesful = allUTXOs.length - succesful.length;
 
-        console.log("TX rate = " + succesful.length * 1000.0 / milliSeconds);
+        console.log("TPS = " + Math.floor(succesful.length * 1000.0 / milliSeconds));
 
         console.log("Sended succesfully: " + succesful.length);
 
         console.log("Unsuccesful " + unsuccesful);
 
-        console.log("Speeping and waiting for " + delay/1000 + " seconds");
+        console.log("Speeping and waiting for block to be produced");
         setTimeout(main , delay);
         return
     } catch(e) {

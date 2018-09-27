@@ -12,6 +12,19 @@
     ./run.sh
 ```
 
+## Toy benchmark
+
+Run the dockerized deployment from above and than run a benchmark
+
+```
+    cd toyBenchmark
+    git submodule update --init --recursive
+    npm install
+    node toyBenchmark.js
+```
+
+Depending on the size of your docker you results will vary. Test in limited environment with 2 CPUs and 2GB of memory shows 350-500 TPS, limited primary by small database in the container.
+
 ## List of allowed accounts for further use of API calls
 
 ```
