@@ -23,7 +23,7 @@ Run the dockerized deployment from above and than run a benchmark
     node toyBenchmark.js
 ```
 
-Depending on the size of your docker you results will vary. Test in limited environment with 2 CPUs and 2GB of memory shows 350-500 TPS, limited primary by small database in the container.
+Depending on the size of your docker you results will vary. Test in limited environment with 2 CPUs and 2GB of memory shows 350-500 TPS, limited primary by small database in the container. There are hyperparameters for a test that is written in JS, such as how many parallel requests are allowed and what is the largest UTXO set size. You can vary those, but incresing the number of parallet requests, for example, may require system tuning (ulimits).
 
 ## List of allowed accounts for further use of API calls
 
