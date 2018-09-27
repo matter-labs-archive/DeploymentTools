@@ -75,7 +75,7 @@ This starts an exit by making a transaction to the Plasma smart-contract
     }
 ```
 
-This will list all the UTXOs that belong to the user and where created in this block, transaction and output number or later. Orders by block number, transaction number and output number in sequence
+This will list the UTXOs that belong to the user and where created in this block, transaction and output number or later. Orders by block number, transaction number and output number in sequence. Maximum limit is 100.
 
 ### Make a transfer
 
@@ -95,7 +95,11 @@ Under the hood it assembles a well-formed transaction, signs it from the corresp
         ],
         "outputs": [
             {
-                "amount": "2000",
+                "amount": "1000",
+                "to": "0x5aeda56215b167893e80b4fe645ba6d5bab767de"
+            },
+            {
+                "amount": "1000",
                 "to": "0x5aeda56215b167893e80b4fe645ba6d5bab767de"
             }
         ],
@@ -103,7 +107,7 @@ Under the hood it assembles a well-formed transaction, signs it from the corresp
     }
 ```
 
-If you do the transfer to the account not in a list above - you will not be able to later spend or exit it
+If you do the transfer to the account not in a list above - you will not be able to later spend or exit it. Transfer should spend an UTXO is full, with sum of output amounts equal to the sum of input amounts. Amount of inputs in limited to 3, number of outputs is limited to 3.
 
 ## Authors
 
