@@ -2,3 +2,6 @@
 	path = minimalBackend/ganache/PlasmaContract
 	url = https://github.com/matterinc/PlasmaContract.git
 	branch = master
+[submodule "toyBenchmark/lib"]
+	path = toyBenchmark/lib
+	url = https://github.com/matterinc/PlasmaTransactionJS
