@@ -5,3 +5,5 @@ minimalBackend/data/contract/*
 !minimalBackend/data/contract/.keep
 minimalBackend/data/fdb/*
 !minimalBackend/data/fdb/.keep
+toyBenchmark/node_modules
+.vscode

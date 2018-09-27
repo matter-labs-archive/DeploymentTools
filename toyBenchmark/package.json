@@ -1,0 +1,17 @@
+{
+  "name": "toybenchmark",
+  "version": "1.0.0",
+  "description": "",
+  "main": "createTransaction.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ethereumjs-util": "^5.2.0",
+    "promise-limit": "^2.7.0",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5"
+  }
+}
